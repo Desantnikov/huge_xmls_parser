@@ -7,13 +7,13 @@ import xml.etree.ElementTree as etree
 from classes import SlotDict
 
 
-REPORTING_FREQUENCY = 100000  # report every X lines
+REPORTING_FREQUENCY = 500000  # report every X lines
 COLUMNS_TYPES = {'PRIMARY_ACTIVITY': 'category',
                  'STAN': 'category',
                  # 'AUTHORIZED_CAPITAL': 'int16',
                  'KVED': 'category',
-                 'CODE': 'category',
-                 'REGION': 'category'}
+                 'CODE': 'category',}
+                 # 'REGION': 'category'}
                  # 'EDRPOU': 'int16'}
 
 
@@ -39,19 +39,19 @@ def objects_from_xml(path):
     objects_list = []
 
     for counter, (event, elem) in enumerate(etree.iterparse(path, events=['start'])):
-        if counter > 1000:
-            break
+        # if counter > 1000:
+        #     break
         # import pdb; pdb.set_trace()
         if not counter % REPORTING_FREQUENCY:
             print(f'Processing {counter}"th element')
-            print(f'Elem: {elem.tag} \r\nText: {elem.text or None}')
+            # print(f'Elem: {elem.tag} \r\nText: {elem.text or None}')
 
         if all((previous_elem.tag in ['SUBJECT', 'RECORD'], elem.tag == 'NAME')):
             # Several 'NAME' fields may be inside one organization's data, so need to be sure that we process
             # exactly organization's name that is usually the first in the SUBJECT block
             objects_list.append(SlotDict(name=elem.text))
 
-        elif any((elem.tag in ('DATA', 'SUBJECT'), not elem.text)):
+        elif elem.tag in ('DATA', 'SUBJECT'):
             # Skip useless tags
             previous_elem = elem
             continue

@@ -27,34 +27,45 @@ SAVE_FOLDER = './output_files'
 # KVED, STAN and FIO category - 2.2GB
 
 
-if not os.path.exists(SAVE_FOLDER):
-    os.mkdir(SAVE_FOLDER)
+def run(input_file_path):
+    if not os.path.exists(SAVE_FOLDER):
+        os.mkdir(SAVE_FOLDER)
 
-files = ["C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml",
-         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml",
-         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_FULL_07.08.2020.xml",
-         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml"]
-
-input_file_path = files[0]
-
-objects_list = objects_from_xml(input_file_path)
+    objects_list = objects_from_xml(input_file_path)
 
 
-df = pd.DataFrame([parsed_object.get_data() for parsed_object in objects_list], columns=REQUIRED_COLUMNS)
+    df = pd.DataFrame([parsed_object.get_data() for parsed_object in objects_list], columns=REQUIRED_COLUMNS)
 
-reduce_dataframe_size(df)
-unique_regions = [region[1] for region in df.REGION.unique().dropna() if region[1] is not None]
+    # del(objects_list)
 
-for region in unique_regions:
-    if not region:
-        continue
-    name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
-    store_as_excel(df=df.where(df.REGION.str.contains(region)).dropna(), name=f'{SAVE_FOLDER}/{name}')
+    reduce_dataframe_size(df)
+    try:
+        unique_regions = [region[1] for region in df.REGION.unique() if region[1] is not None]
+    except:
+        import pdb; pdb.set_trace()
+
+    for region in unique_regions:
+        # if not region:
+        #     continue
+        import pdb;
+        pdb.set_trace()
+        try:
+            name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
+            store_as_excel(df=df.where(df.ADDRESS.str.contains(region)).dropna(), name=f'{SAVE_FOLDER}/{name}')
+        except:
+            import pdb;
+            pdb.set_trace()
+            # store_as_excel(df=df[df['ADDRESS'].astype('str').str.contains('Вінницька')], name=f'{SAVE_FOLDER}/{name}')
+            # df[df['ADDRESS'].astype('str').str.contains('Вінницька')]
+    # import gc
     # gc.collect()
 
 
+if __name__ == '__main__':
+    # files = ["C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml",
+    #          "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml",
+    #          "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_FULL_07.08.2020.xml",
+    # files=[ "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml"]
 
-
-# if __name__ == '__main__':
-#     run()
-
+    # [run(file) for file in files]
+    run("C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")

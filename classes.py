@@ -27,9 +27,13 @@ class SlotDict(object):
         return list(zip(self.__slots__, [getattr(self, name) for name in self.__slots__]))
 
     def set_region(self):
-        region = re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ обл[.]', self.ADDRESS) or \
-                 re.search(r'місто [А-Яа-яёЁЇїІіЄєҐґ]+', self.ADDRESS) or \
-                 re.search(r'Автономна Республіка Крим', self.ADDRESS)
+        region = None
+
+        if self.ADDRESS:
+            region = re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ обл[.]', self.ADDRESS) or \
+                     re.search(r'місто Київ', self.ADDRESS)
 
         if region:
             self.REGION = region.group()
+        else:
+            self.REGION = 'неопределен'

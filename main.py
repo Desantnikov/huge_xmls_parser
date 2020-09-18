@@ -1,45 +1,11 @@
 import os
 
-import xml.etree.ElementTree as etree
 import pandas as pd
-import xlsxwriter
 
-REQUIRED_COLUMNS = ("NAME", "CONTACTS", "SIGNERS", "PRIMARY ACTIVITY", "AUTHORIZED_CAPITAL", "EDRPOU", "STAN",
-                    "REGISTRATION", "ADDRESS")
+from functions import objects_from_xml, reduce_dataframe_size, store_as_excel
+from classes import REQUIRED_COLUMNS
 
-
-def dataframe_from_xml(path):
-    print('Creating dataframe from xml ')
-
-    xml_tree = etree.parse(path)
-    xml_root = xml_tree.getroot()
-
-    return pd.DataFrame({elem.tag: elem.text for elem in node} for node in xml_root)
-
-
-def regions_from_dataframe(df):
-    print('Dividing by regions')
-    # Filter unique regions from dataframe by ' обл.' string and strips them
-    # TODO: Add Crimea, Kyiv and so on!!!
-
-    unique_regions = pd.Series(pd.unique(df['ADDRESS'].str.split(',', expand=True)[2].str.strip()))
-
-    return unique_regions.where(unique_regions.str.contains(' обл.')).dropna(inplace=False)
-
-
-def store_as_excel(df, name, rows_per_file=100000):
-    for i in range(1, len(df) // rows_per_file):
-        # save files storing X rows in each\
-
-        with pd.ExcelWriter(f'{name}_part_{i}.xlsx', engine='xlsxwriter') as writer:
-            print(f'Trying to save: "{name}_part_{i}.xlsx"')
-            df[:i*rows_per_file].to_excel(writer, engine='xlsxwriter')
-            print(f'File {name}_part_{i} saved')
-
-    # save file with remaining rows
-    with pd.ExcelWriter(f'./{name}_part_last.xlsx', engine='xlsxwriter') as writer:
-        df[:-len(df) % rows_per_file].to_excel(writer)
-        print(f'./{name}_part_last.xlsx')
+SAVE_FOLDER = './output_files'
 
 
 # 17.2-EX_XML_EDR_FOP_11.09.2020.xml
@@ -49,26 +15,46 @@ def store_as_excel(df, name, rows_per_file=100000):
 # ['NAME', 'SHORT_NAME', 'EDRPOU', 'ADDRESS', 'KVED', 'BOSS', 'BENEFICIARIES', 'FOUNDERS', 'STAN']
 
 # 17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml
-#
 
 # 17.2-EX_XML_EDR_FOP_FULL_07.08.2020.xml
 #
-
-input_file_path = "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml"
-
-df = dataframe_from_xml(input_file_path)
-
-import pdb; pdb.set_trace()
-
-regions = regions_from_dataframe(df)
+# df.memory_usage(index=True).sum() / 1024 * 2
+# df.info(memory_usage='deep')
 
 
-for region in regions:
-    name = f'{os.path.basename(input_file_path).replace(" ","_").replace(".xml", "")}_{region}'
-    store_as_excel(df=df.where(df['ADDRESS'].str.contains(region)).dropna(), name=name)
+# KVED category - 2.6 GB
+# KVED and STAN category - 2GB
+# KVED, STAN and FIO category - 2.2GB
+
+
+if not os.path.exists(SAVE_FOLDER):
+    os.mkdir(SAVE_FOLDER)
+
+files = ["C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml",
+         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml",
+         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_FULL_07.08.2020.xml",
+         "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml"]
+
+input_file_path = files[0]
+
+objects_list = objects_from_xml(input_file_path)
+
+
+df = pd.DataFrame([parsed_object.get_data() for parsed_object in objects_list], columns=REQUIRED_COLUMNS)
+
+reduce_dataframe_size(df)
+unique_regions = [region[1] for region in df.REGION.unique().dropna() if region[1] is not None]
+
+for region in unique_regions:
+    if not region:
+        continue
+    name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
+    store_as_excel(df=df.where(df.REGION.str.contains(region)).dropna(), name=f'{SAVE_FOLDER}/{name}')
+    # gc.collect()
 
 
 
-import pdb; pdb.set_trace()
-# -------------
+
+# if __name__ == '__main__':
+#     run()
 

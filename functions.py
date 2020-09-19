@@ -1,10 +1,12 @@
 import types
-import xml.etree.ElementTree as etree
+import re
 
+import xml.etree.ElementTree as etree
 import pandas as pd
 
 from classes import SlotDict
 
+EMAIL_REGEXP = r'(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))'
 REPORTING_FREQUENCY = 500000  # report every X lines
 COLUMNS_TYPES = {'PRIMARY_ACTIVITY': 'category',
                  'STAN': 'category',
@@ -79,6 +81,15 @@ def objects_from_xml(path):
 
             if 'ADDRESS' in elem.tag:
                 objects_list[-1].set_region()
+
+            if 'CONTACTS' in elem.tag and elem.text:
+                email = re.search(EMAIL_REGEXP, elem.text)
+                if email:
+                    objects_list[-1].add_email(email.group())
+                else:
+                    email = re.search(r'\w+@\w+', elem.text)
+                if email:
+                    objects_list[-1].add_email(email.group())
 
         previous_elem = elem
 

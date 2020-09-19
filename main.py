@@ -23,14 +23,14 @@ SAVE_FOLDER = './output_files'
 
 def parse_tov():
     first_objects_list = objects_from_xml(
-        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml")
+        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
     first_df = pd.DataFrame([parsed_object.get_data() for parsed_object in first_objects_list],
                             columns=REQUIRED_COLUMNS)
     reduce_dataframe_size(first_df)
     # print('first df done')
 
     second_objects_list = objects_from_xml(
-        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_FULL_07.08.2020.xml")
+        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml")
     second_df = pd.DataFrame([parsed_object.get_data() for parsed_object in second_objects_list],
                              columns=REQUIRED_COLUMNS)
 
@@ -44,6 +44,8 @@ def parse_tov():
     del first_df, second_df
 
     df = df[df.CONTACTS.notna()][df.CONTACTS != 0]
+    if 'STAN' in df.columns:
+        df = df[df.STAN != 'припинено']
 
     # import pdb; pdb.set_trace()
 

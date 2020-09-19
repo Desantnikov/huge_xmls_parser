@@ -2,7 +2,7 @@ import re
 
 
 REQUIRED_COLUMNS = ("NAME", "CONTACTS", "SIGNERS", "PRIMARY_ACTIVITY", "AUTHORIZED_CAPITAL", "EDRPOU", "STAN",
-                    "REGISTRATION", "ADDRESS", "REGION")
+                    "REGISTRATION", "ADDRESS", "REGION", "EMAILS")
 
 
 class SlotDict(object):
@@ -12,6 +12,7 @@ class SlotDict(object):
         [super(SlotDict, self).__setattr__(attribute, None) for attribute in self.__slots__]
         self.NAME = name
         self.SIGNERS = []
+        self.EMAILS = []
 
     def __setattr__(self, instance, value):
         # Disable rewriting for all attributes except specified
@@ -23,6 +24,10 @@ class SlotDict(object):
 
     def add_signer(self, signer):
         self.SIGNERS.append(signer)
+
+    def add_email(self, email):
+        if email not in self.EMAILS:
+            self.EMAILS.append(email)
 
     def get_data(self):
         return [getattr(self, name) if not isinstance(getattr(self, name), list) else '; '.join(getattr(self, name))

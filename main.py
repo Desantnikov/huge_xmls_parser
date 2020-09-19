@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from functions import objects_from_xml, reduce_dataframe_size, store_as_excel
 from classes import REQUIRED_COLUMNS
+from functions import objects_from_xml, reduce_dataframe_size, store_as_excel
 
 SAVE_FOLDER = './output_files'
 
@@ -33,30 +33,17 @@ def run(input_file_path):
 
     objects_list = objects_from_xml(input_file_path)
 
-
     df = pd.DataFrame([parsed_object.get_data() for parsed_object in objects_list], columns=REQUIRED_COLUMNS)
 
-    del objects_list
+    # del objects_list
     # 5gb used withut del and reduce
 
+    import pdb; pdb.set_trace()
     reduce_dataframe_size(df)
 
     for region in df.REGION.unique():
-        # if not region:
-        #     continue
-        import pdb;
-        pdb.set_trace()
-        try:
-            name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
-            store_as_excel(df=df.where(df.REGION == region).dropna(how='all'), name=f'{SAVE_FOLDER}/{name}')
-        except:
-            import pdb;
-            pdb.set_trace()
-            # df.where(df.REGION == 'Вінницька обл.').dropna(how='all')
-            # store_as_excel(df=df[df['ADDRESS'].astype('str').str.contains('Вінницька')], name=f'{SAVE_FOLDER}/{name}')
-            # df[df['ADDRESS'].astype('str').str.contains('Вінницька')]
-    # import gc
-    # gc.collect()
+        name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
+        store_as_excel(df=df.where(df.REGION == region).dropna(how='all'), name=f'{SAVE_FOLDER}/{name}')
 
 
 if __name__ == '__main__':
@@ -66,4 +53,40 @@ if __name__ == '__main__':
     # files=[ "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.2-EX_XML_EDR_FOP_11.09.2020.xml"]
 
     # [run(file) for file in files]
-    run("C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
+    # run("C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
+
+    # first_objects_list = objects_from_xml(
+    #     "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
+    # first_df = pd.DataFrame([parsed_object.get_data() for parsed_object in first_objects_list],
+    #                         columns=REQUIRED_COLUMNS)
+    # # reduce_dataframe_size(first_df)
+    # print('first df done')
+
+
+    second_objects_list = objects_from_xml(
+        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_FULL_07.08.2020.xml")
+    second_df = pd.DataFrame([parsed_object.get_data() for parsed_object in second_objects_list],
+                             columns=REQUIRED_COLUMNS)
+
+    second_df = second_df[second_df.CONTACTS.notna()]
+    # reduce_dataframe_size(second_df)
+    print('second df done')
+    # first_df[first_df.CONTACTS.notna()]
+    # second_df[second_df.CONTACTS.notna()]
+    # import pdb; pdb.set_trace()
+    # try:
+    #     print('try')
+    #     # first_df.merge(second_df, on='NAME', how='outer')
+    #     # first_df.merge(second_df, 'NAME')
+    #     # first_df.set_index('NAME').join(second_df.set_index('NAME'), on='NAME', how='outer', lsuffix='_left', rsuffix='_right')
+    # except:
+    #     print('failed to join')
+    #     import pdb;
+    #     pdb.set_trace()
+
+    # import pdb; pdb.set_trace()
+
+    input_file_path = '17.1-EX_XML_EDR_UO_'
+    for region in second_df.REGION.unique():
+        name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
+        store_as_excel(df=second_df.where(second_df.REGION == region).dropna(how='all'), name=f'{SAVE_FOLDER}/{name}')

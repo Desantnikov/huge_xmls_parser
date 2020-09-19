@@ -8,11 +8,11 @@ from classes import SlotDict
 REPORTING_FREQUENCY = 500000  # report every X lines
 COLUMNS_TYPES = {'PRIMARY_ACTIVITY': 'category',
                  'STAN': 'category',
-                 'AUTHORIZED_CAPITAL': 'int16',
+                 # 'AUTHORIZED_CAPITAL': 'int16',
                  'KVED': 'category',
                  'CODE': 'category',
-                 'REGION': 'category',
-                 'EDRPOU': 'int16'}
+                 'REGION': 'category'}
+                 # 'EDRPOU': 'int16'}
 
 
 def reduce_dataframe_size(df):
@@ -37,8 +37,8 @@ def objects_from_xml(path):
     objects_list = []
 
     for counter, (event, elem) in enumerate(etree.iterparse(path, events=['start'])):
-        # if counter > 1000:
-        #     break
+        if counter > 1000:
+            break
         # import pdb; pdb.set_trace()
         if not counter % REPORTING_FREQUENCY:
             print(f'Processing {counter}"th element')

@@ -18,7 +18,8 @@ class SlotDict(object):
         if getattr(self, instance) is None:
             super(SlotDict, self).__setattr__(instance, value)
         else:
-            print(f'{instance} attribute is already set')
+            # print(f'{instance} attribute is already set')
+            pass
 
     def add_signer(self, signer):
         self.SIGNERS.append(signer)
@@ -30,10 +31,18 @@ class SlotDict(object):
         region = None
 
         if self.ADDRESS:
-            region = re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ обл[.]', self.ADDRESS) or \
-                     re.search(r'місто Київ', self.ADDRESS)
+            region = re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ (обл\.|ОБЛАСТЬ)', self.ADDRESS) or \
+                     re.search(r'місто Київ', self.ADDRESS) #or \
+                     # re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ ОБЛАСТЬ', self.ADDRESS)
+
+
 
         if region:
-            self.REGION = region.group()
+            region = region.group()
+
+            if 'обл.' in region or 'ОБЛАСТЬ' in region:
+                region = region.split(' ')[0].lower()
+
+            self.REGION = region
         else:
             self.REGION = 'неопределен'

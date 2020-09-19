@@ -1,20 +1,18 @@
-import gc
 import types
-
-import pandas as pd
 import xml.etree.ElementTree as etree
 
-from classes import SlotDict
+import pandas as pd
 
+from classes import SlotDict
 
 REPORTING_FREQUENCY = 500000  # report every X lines
 COLUMNS_TYPES = {'PRIMARY_ACTIVITY': 'category',
                  'STAN': 'category',
-                 # 'AUTHORIZED_CAPITAL': 'int16',
+                 'AUTHORIZED_CAPITAL': 'int16',
                  'KVED': 'category',
-                 'CODE': 'category',}
-                 # 'REGION': 'category'}
-                 # 'EDRPOU': 'int16'}
+                 'CODE': 'category',
+                 'REGION': 'category',
+                 'EDRPOU': 'int16'}
 
 
 def reduce_dataframe_size(df):

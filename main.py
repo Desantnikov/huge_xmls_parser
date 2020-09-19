@@ -36,25 +36,23 @@ def run(input_file_path):
 
     df = pd.DataFrame([parsed_object.get_data() for parsed_object in objects_list], columns=REQUIRED_COLUMNS)
 
-    # del(objects_list)
+    del objects_list
+    # 5gb used withut del and reduce
 
     reduce_dataframe_size(df)
-    try:
-        unique_regions = [region[1] for region in df.REGION.unique() if region[1] is not None]
-    except:
-        import pdb; pdb.set_trace()
 
-    for region in unique_regions:
+    for region in df.REGION.unique():
         # if not region:
         #     continue
         import pdb;
         pdb.set_trace()
         try:
             name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
-            store_as_excel(df=df.where(df.ADDRESS.str.contains(region)).dropna(), name=f'{SAVE_FOLDER}/{name}')
+            store_as_excel(df=df.where(df.REGION == region).dropna(how='all'), name=f'{SAVE_FOLDER}/{name}')
         except:
             import pdb;
             pdb.set_trace()
+            # df.where(df.REGION == 'Вінницька обл.').dropna(how='all')
             # store_as_excel(df=df[df['ADDRESS'].astype('str').str.contains('Вінницька')], name=f'{SAVE_FOLDER}/{name}')
             # df[df['ADDRESS'].astype('str').str.contains('Вінницька')]
     # import gc

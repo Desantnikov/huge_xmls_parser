@@ -24,7 +24,7 @@ class SlotDict(object):
         self.SIGNERS.append(signer)
 
     def get_data(self):
-        return list(zip(self.__slots__, [getattr(self, name) for name in self.__slots__]))
+        return [getattr(self, name) for name in self.__slots__]
 
     def set_region(self):
         region = None

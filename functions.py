@@ -39,12 +39,15 @@ def objects_from_xml(path):
     for counter, (event, elem) in enumerate(etree.iterparse(path, events=['start'])):
         if counter > 4000:
             break
-        # import pdb; pdb.set_trace()
+
         if not counter % REPORTING_FREQUENCY:
             print(f'Processing {counter}"th element')
-            # print(f'Elem: {elem.tag} \r\nText: {elem.text or None}')
+        # print(f'Elem: {elem.tag} \r\nText: {elem.text or None}')
 
-        if all((previous_elem.tag in ['SUBJECT', 'RECORD'], elem.tag == 'NAME')):
+        # import pdb;
+        # pdb.set_trace()
+
+        if all((previous_elem.tag in ['SUBJECT', 'RECORD'], any((elem.tag == 'NAME', elem.tag == 'FIO')))):
             # Several 'NAME' fields may be inside one organization's data, so need to be sure that we process
             # exactly organization's name that is usually the first in the SUBJECT block
             objects_list.append(SlotDict(name=elem.text))

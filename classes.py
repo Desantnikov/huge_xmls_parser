@@ -25,17 +25,16 @@ class SlotDict(object):
         self.SIGNERS.append(signer)
 
     def get_data(self):
-        return [getattr(self, name) for name in self.__slots__]
+        return [getattr(self, name) if not isinstance(getattr(self, name), list) else '; '.join(getattr(self, name))
+                for name in self.__slots__]
 
     def set_region(self):
         region = None
 
         if self.ADDRESS:
             region = re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ (обл\.|ОБЛАСТЬ)', self.ADDRESS) or \
-                     re.search(r'місто Київ', self.ADDRESS) #or \
-                     # re.search(r'[А-Яа-яёЁЇїІіЄєҐґ]+ ОБЛАСТЬ', self.ADDRESS)
-
-
+                     re.search(r'місто Київ', self.ADDRESS) or \
+                     re.search(r'Автономна Республіка Крим', self.ADDRESS)
 
         if region:
             region = region.group()

@@ -55,11 +55,11 @@ if __name__ == '__main__':
     # [run(file) for file in files]
     # run("C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
 
-    # first_objects_list = objects_from_xml(
-    #     "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
-    # first_df = pd.DataFrame([parsed_object.get_data() for parsed_object in first_objects_list],
-    #                         columns=REQUIRED_COLUMNS)
-    # # reduce_dataframe_size(first_df)
+    first_objects_list = objects_from_xml(
+        "C:\\Users\\anton.desiatnykov\\Desktop\\fop_base\\17.1-EX_XML_EDR_UO_11.09.2020.xml")
+    first_df = pd.DataFrame([parsed_object.get_data() for parsed_object in first_objects_list],
+                            columns=REQUIRED_COLUMNS)
+    reduce_dataframe_size(first_df)
     # print('first df done')
 
 
@@ -68,25 +68,20 @@ if __name__ == '__main__':
     second_df = pd.DataFrame([parsed_object.get_data() for parsed_object in second_objects_list],
                              columns=REQUIRED_COLUMNS)
 
-    second_df = second_df[second_df.CONTACTS.notna()]
-    # reduce_dataframe_size(second_df)
+    reduce_dataframe_size(second_df)
+
     print('second df done')
     # first_df[first_df.CONTACTS.notna()]
-    # second_df[second_df.CONTACTS.notna()]
-    # import pdb; pdb.set_trace()
-    # try:
-    #     print('try')
-    #     # first_df.merge(second_df, on='NAME', how='outer')
-    #     # first_df.merge(second_df, 'NAME')
-    #     # first_df.set_index('NAME').join(second_df.set_index('NAME'), on='NAME', how='outer', lsuffix='_left', rsuffix='_right')
-    # except:
-    #     print('failed to join')
-    #     import pdb;
-    #     pdb.set_trace()
+
+    df = pd.concat([first_df, second_df]).groupby('NAME', sort=False).sum(min_count=1)
+
+    del first_df, second_df
+
+    df = df[df.CONTACTS.notna()][df.CONTACTS != 0]
 
     # import pdb; pdb.set_trace()
 
     input_file_path = '17.1-EX_XML_EDR_UO_'
-    for region in second_df.REGION.unique():
+    for region in df.REGION.unique():
         name = f'{os.path.basename(input_file_path).replace(".", "_").replace(" ","_").replace(".xml", "")}_{region}'
-        store_as_excel(df=second_df.where(second_df.REGION == region).dropna(how='all'), name=f'{SAVE_FOLDER}/{name}')
+        store_as_excel(df=df[df.REGION == region], name=f'{SAVE_FOLDER}/{name}')

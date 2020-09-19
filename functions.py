@@ -37,7 +37,7 @@ def objects_from_xml(path):
     objects_list = []
 
     for counter, (event, elem) in enumerate(etree.iterparse(path, events=['start'])):
-        if counter > 1000:
+        if counter > 4000:
             break
         # import pdb; pdb.set_trace()
         if not counter % REPORTING_FREQUENCY:

@@ -1,6 +1,6 @@
 # huge_xmls_parser
 
-Task was to parse, concatenate, filter and aggregate a sequence of ~9GB xml files. Then data should be divided by regions and saved 
+Job was to parse, concatenate, filter and aggregate a sequence of ~9GB xml files. Then data should be divided by regions and saved 
 to corresponding excel files, max 100k of rows in each. 
 
 Code is not refactored and looks not very pretty since it was a one-time job that is already done. 

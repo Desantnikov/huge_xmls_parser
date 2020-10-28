@@ -39,8 +39,8 @@ def objects_from_xml(path):
     objects_list = []
 
     for counter, (event, elem) in enumerate(etree.iterparse(path, events=['start'])):
-        if counter > 4000:
-            break
+        # if counter > 4000:
+        #     break
 
         if not counter % REPORTING_FREQUENCY:
             print(f'Processing {counter}"th element')

@@ -6,6 +6,11 @@ REQUIRED_COLUMNS = ("NAME", "CONTACTS", "SIGNERS", "PRIMARY_ACTIVITY", "AUTHORIZ
 
 
 class SlotDict(object):
+    """
+        RAM saving
+        Logic incapsulating
+    """
+
     __slots__ = REQUIRED_COLUMNS
 
     def __init__(self, name):
@@ -19,7 +24,6 @@ class SlotDict(object):
         if getattr(self, instance) is None:
             super(SlotDict, self).__setattr__(instance, value)
         else:
-            # print(f'{instance} attribute is already set')
             pass
 
     def add_signer(self, signer):
